@@ -1,52 +1,25 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JavaScript Console with Predefined Functions</title>
+    <title>izumi's page</title>
     <style>
-        body {
-            font-family: monospace;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-            margin: 0;
-            padding: 20px;
-        }
-        #app {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        #console {
-            background-color: #2d2d2d;
-            border: 1px solid #3c3c3c;
-            padding: 10px;
-            height: 400px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .console-line {
-            margin-bottom: 5px;
-        }
-        .input {
-            color: #569cd6;
-        }
-        .output {
-            color: #ce9178;
-        }
-        .error {
-            color: #f44747;
-        }
-        #input {
-            width: 100%;
-            padding: 5px;
-            background-color: #3c3c3c;
-            border: 1px solid #4c4c4c;
-            color: #d4d4d4;
-            font-family: monospace;
-        }
+        body,#console,#input{font:12px monospace;color:#d4d4d4;background:#1e1e1e}
+        body{margin:0;padding:20px}
+        #app{max-width:800px;margin:auto}
+        #console,#input{border:1px solid;padding:5px 10px;width:100%;box-sizing:border-box}
+        #console{background:#2d2d2d;border-color:#3c3c3c;height:400px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word}
+        .console-line{margin-bottom:5px}
+        .input{color:#569cd6}
+        .output{color:#aff280}
+        .error{color:#f44747}
+        .system{color:#d4d4d4}
+        #input{background:#3c3c3c;border-color:#4c4c4c}
     </style>
 </head>
+
 <body>
     <div id="app">
         <div id="console"></div>
@@ -54,69 +27,49 @@
     </div>
 
     <script>
-        // util
-        // JSONのコロンを揃える
-        function alignJsonColons(jsonString) {
-          const lines = jsonString.split('\n');
-          const maxKeyLength = Math.max(...lines.map(line => line.indexOf(':')));
-
-          return lines.map(line => {
-            const colonIndex = line.indexOf(':');
-            if (colonIndex === -1) return line;
-
-            const keyPart = line.slice(0, colonIndex).padEnd(maxKeyLength);
-            const valuePart = line.slice(colonIndex);
-
-            return keyPart + valuePart;
-          }).join('\n');
-        }
-        // 事前定義関数
-        function g() {
-            return alignJsonColons(JSON.stringify({
-                name     : "izumi",
-                skills   : "指でEXILEのモノマネ",
-                languages: "Julia, 日本語",
-                dream    : "ユーザーがCLIゲームを公開できるプラットフォームの作成"
-            }, null, 2));
-        }
-
-        // コンソール機能
+        /*******************
+         *  コンソール機能 *
+         *******************/
         const consoleElement = document.getElementById('console');
-        const inputElement = document.getElementById('input');
+        const inputElement   = document.getElementById('input');
 
         function appendToConsole(type, content) {
-            const line = document.createElement('div');
-            line.className = `console-line ${type}`;
-            line.textContent = type === 'input' ? `> ${content}` : content;
+            const line       = document.createElement('div');
+            line.className   = `console-line ${type}`;
+            line.textContent = (type === 'input' ? '> ' : '') + String(content);
             consoleElement.appendChild(line);
             consoleElement.scrollTop = consoleElement.scrollHeight;
         }
 
-        function executeCode(code) {
-            if (code.trim() === '') return;
-
-            appendToConsole('input', code);
-
+        inputElement.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter' || e.shiftKey) return;
+            e.preventDefault();
+            if (!this.value.trim()) return;
+            appendToConsole('input' , this.value);
             try {
-                const result = eval(code);
-                appendToConsole('output', result !== undefined ? result : 'undefined');
-            } catch (error) {
-                appendToConsole('error', error.toString());
-            }
-
-            inputElement.value = '';
-        }
-
-        inputElement.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                executeCode(this.value);
+                var result = eval(this.value);
+                if (typeof(result) === 'object') { // jsonにしてコロンを揃える
+                    const lines        = JSON.stringify(result, null, 2).split('\n');
+                    const maxKeyLength = Math.max(...lines.map(line => line.indexOf(':')));
+                    result = lines.map(line => {
+                        const [key, value] = line.split(':');
+                        return value ? key.padEnd(maxKeyLength) + ':' + (value || '') : line;
+                    }).join('\n');
+                }
+                appendToConsole('output', result);
+                inputElement.value = '';
+            } catch (e) {
+                appendToConsole('error', e.toString());
             }
         });
 
-        // 初期メッセージ
-        appendToConsole('output', '利用可能なコマンド:');
-        appendToConsole('output', '- g(): 自己紹介を返します');
+        /*****************
+         *  事前定義関数 *
+         *****************/
+        appendToConsole('system', '利用可能なコマンド:');
+        appendToConsole('system', '- selfIntro(): 自己紹介を返します。');
+        function selfIntro() { return {name: "izumi", skills: "指でEXILEのモノマネ", languages: "日本語"} }
     </script>
 </body>
+
 </html>

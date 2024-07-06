@@ -44,7 +44,7 @@
             if (!this.value.trim()) return;
             appendToConsole('input' , this.value);
             try {
-                var result = eval(this.value);
+                var result = Function('"use strict";return (' + this.value + ')')();
                 if (typeof(result) === 'object') { // jsonにしてコロンを揃える
                     const lines        = JSON.stringify(result, null, 2).split('\n');
                     const maxKeyLength = Math.max(...lines.map(line => line.indexOf(':')));

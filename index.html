@@ -27,9 +27,6 @@
     </div>
 
     <script>
-        /*******************
-         *  コンソール機能 *
-         *******************/
         const consoleElement = document.getElementById('console');
         const inputElement   = document.getElementById('input');
 
@@ -63,9 +60,6 @@
             }
         });
 
-        /*****************
-         *  事前定義関数 *
-         *****************/
         appendToConsole('system', '利用可能なコマンド:');
         appendToConsole('system', '- selfIntro(): 自己紹介を返します。');
         function selfIntro() { return {name: "izumi", skills: "指でEXILEのモノマネ", languages: "日本語"} }

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Console with Predefined Functions</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            margin: 0;
+            padding: 20px;
+        }
+        #app {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        #console {
+            background-color: #2d2d2d;
+            border: 1px solid #3c3c3c;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .console-line {
+            margin-bottom: 5px;
+        }
+        .input {
+            color: #569cd6;
+        }
+        .output {
+            color: #ce9178;
+        }
+        .error {
+            color: #f44747;
+        }
+        #input {
+            width: 100%;
+            padding: 5px;
+            background-color: #3c3c3c;
+            border: 1px solid #4c4c4c;
+            color: #d4d4d4;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="console"></div>
+        <input type="text" id="input" placeholder="コマンドを入力してEnterを押してください">
+    </div>
+
+    <script>
+        // util
+        // JSONのコロンを揃える
+        function alignJsonColons(jsonString) {
+          const lines = jsonString.split('\n');
+          const maxKeyLength = Math.max(...lines.map(line => line.indexOf(':')));
+
+          return lines.map(line => {
+            const colonIndex = line.indexOf(':');
+            if (colonIndex === -1) return line;
+
+            const keyPart = line.slice(0, colonIndex).padEnd(maxKeyLength);
+            const valuePart = line.slice(colonIndex);
+
+            return keyPart + valuePart;
+          }).join('\n');
+        }
+        // 事前定義関数
+        function g() {
+            return alignJsonColons(JSON.stringify({
+                name     : "izumi",
+                skills   : "指でEXILEのモノマネ",
+                languages: "Julia, 日本語",
+                dream    : "ユーザーがCLIゲームを公開できるプラットフォームの作成"
+            }, null, 2));
+        }
+
+        // コンソール機能
+        const consoleElement = document.getElementById('console');
+        const inputElement = document.getElementById('input');
+
+        function appendToConsole(type, content) {
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            line.textContent = type === 'input' ? `> ${content}` : content;
+            consoleElement.appendChild(line);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+
+        function executeCode(code) {
+            if (code.trim() === '') return;
+
+            appendToConsole('input', code);
+
+            try {
+                const result = eval(code);
+                appendToConsole('output', result !== undefined ? result : 'undefined');
+            } catch (error) {
+                appendToConsole('error', error.toString());
+            }
+
+            inputElement.value = '';
+        }
+
+        inputElement.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                executeCode(this.value);
+            }
+        });
+
+        // 初期メッセージ
+        appendToConsole('output', '利用可能なコマンド:');
+        appendToConsole('output', '- g(): 自己紹介を返します');
+    </script>
+</body>
+</html>

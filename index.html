@@ -54,10 +54,10 @@
                     }).join('\n');
                 }
                 appendToConsole('output', result);
-                inputElement.value = '';
             } catch (e) {
                 appendToConsole('error', e.toString());
             }
+            inputElement.value = '';
         });
 
         appendToConsole('system', '利用可能なコマンド:');
